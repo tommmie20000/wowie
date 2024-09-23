@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>I have no idea what im doing</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: black;
+        }
+        #dvd-logo {
+            position: absolute;
+            width: 400px;
+            height: 200px;
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+        #cat-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('cat2.webp'); /* Replace with your cat2.png path */
+            background-size: cover;
+            background-position: center;
+            z-index: 1000;
+            display: none;
+            opacity: 0; /* Start with hidden overlay */
+            transition: opacity 0.5s ease-out; /* For fade-out effect */
+        }
+    </style>
+</head>
+<body>
+    <p>Click anywhere to play cool music!</p>
+
+    <audio id="bgAudio" src="shimmy.mp3" loop></audio>
+    <audio id="boomAudio" src="boom.mp3"></audio> <!-- Boom sound -->
+
+    <!-- Bouncing DVD Logo -->
+    <div id="dvd-logo"></div>
+
+    <!-- Hidden cat overlay -->
+    <div id="cat-overlay"></div>
+
+    <script>
+        // Get audio elements
+        var bgAudio = document.getElementById('bgAudio');
+        var boomAudio = document.getElementById('boomAudio');
+        var isPlaying = false;
+
+        // Function to play background audio
+        function playAudio() {
+            bgAudio.play().catch(function(err) {
+                console.error("Error playing the background audio:", err);
+            });
+            isPlaying = true;
+        }
+
+        // Event listener for user interaction (click anywhere on the site)
+        document.addEventListener('click', function() {
+            if (!isPlaying) {
+                playAudio();
+            }
+        });
+
+        // Bouncing DVD logo logic
+        const dvdLogo = document.getElementById("dvd-logo");
+        let xPosition = 100;
+        let yPosition = 100;
+        let xSpeed = 2;
+        let ySpeed = 2;
+        const dvdWidth = 200;
+        const dvdHeight = 100;
+
+        // Array of 7 image URLs (can be PNGs, GIFs, etc.)
+        const dvdImages = [
+            'cat.gif'
+        ];
+
+        // Set the initial image
+        dvdLogo.style.backgroundImage = `url(${dvdImages[0]})`;
+
+        function updatePosition() {
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+
+            // Update position
+            xPosition += xSpeed;
+            yPosition += ySpeed;
+
+            // Check for collision with edges and bounce
+            if (xPosition + dvdWidth >= windowWidth || xPosition <= 0) {
+                xSpeed = -xSpeed;
+                switchImage();
+            }
+            if (yPosition + dvdHeight >= windowHeight || yPosition <= 0) {
+                ySpeed = -ySpeed;
+                switchImage();
+            }
+
+            // Apply new position
+            dvdLogo.style.left = `${xPosition}px`;
+            dvdLogo.style.top = `${yPosition}px`;
+        }
+
+        function switchImage() {
+            // Randomly switch to one of the 7 images
+            const randomIndex = Math.floor(Math.random() * dvdImages.length);
+            dvdLogo.style.backgroundImage = `url(${dvdImages[randomIndex]})`;
+        }
+
+        // Update position every 10ms to create smooth motion
+        setInterval(updatePosition, 10);
+
+        // Flashing Cat Overlay logic with sound and fade
+        function flashCatImage() {
+            var catOverlay = document.getElementById('cat-overlay');
+            var boomAudio = document.getElementById('boomAudio');
+
+            // Play boom sound
+            boomAudio.currentTime = 0; // Rewind audio to start
+            boomAudio.play();
+
+            // Show the cat image with fade effect
+            catOverlay.style.display = 'block';
+            catOverlay.style.opacity = 1; // Fade in
+            setTimeout(function() {
+                catOverlay.style.opacity = 0; // Fade out after 0.5 seconds
+                setTimeout(function() {
+                    catOverlay.style.display = 'none'; // Hide completely after fade-out
+                }, 500); // Wait for fade-out to complete (0.5s)
+            }, 500); // Keep visible for 0.5 seconds before fading
+        }
+
+        // Random interval for the flash between 0 to 30 seconds
+        function randomFlashInterval() {
+            var randomTime = Math.floor(Math.random() * 5000); // Random between 0 to 30 seconds
+            setTimeout(function() {
+                flashCatImage();
+                randomFlashInterval(); // Recurse to schedule the next flash
+            }, randomTime);
+        }
+
+        // Start the first random flash
+        randomFlashInterval();
+    </script>
+</body>
+</html>
