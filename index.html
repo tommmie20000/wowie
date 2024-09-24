@@ -10,6 +10,11 @@
             padding: 0;
             overflow: hidden;
             background-color: black;
+            color: white;
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 20%;
         }
         #dvd-logo {
             position: absolute;
@@ -32,10 +37,21 @@
             opacity: 0; /* Start with hidden overlay */
             transition: opacity 0.5s ease-out; /* For fade-out effect */
         }
+        #counter {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            text-align: center;
+        }
+        #record {
+            font-size: 18px;
+            margin-top: 20px;
+            color: green;
+        }
     </style>
 </head>
 <body>
-    <p>Click anywhere to play cool music!</p>
+    <h1>Click anywhere to play cool music!</h1>
 
     <audio id="bgAudio" src="shimmy.mp3" loop></audio>
     <audio id="boomAudio" src="boom.mp3"></audio> <!-- Boom sound -->
@@ -43,10 +59,53 @@
     <!-- Bouncing DVD Logo -->
     <div id="dvd-logo"></div>
 
+    <h3>How Long You've Been Doing Nothing</h3>
+    <p id="counter">0 seconds</p>
+    <p id="record">Personal Record: 0.000 seconds</p>
+
     <!-- Hidden cat overlay -->
     <div id="cat-overlay"></div>
 
     <script>
+         // Initialize milliseconds and personal record
+         let milliseconds = 0;
+        let personalRecord = 0;
+        let timer;
+
+        // Function to format time in seconds and milliseconds
+        function formatTime(ms) {
+            let seconds = Math.floor(ms / 1000);
+            let remainingMs = ms % 1000;
+            return seconds + "." + remainingMs.toString().padStart(3, '0') + " seconds";
+        }
+
+        // Function to update the counter
+        function updateCounter() {
+            milliseconds += 10;  // Increment by 10 milliseconds
+            document.getElementById("counter").textContent = formatTime(milliseconds);
+        }
+
+        // Function to reset the counter when activity is detected
+        function resetCounter() {
+            // Check if the current inactivity time is greater than the personal record
+            if (milliseconds > personalRecord) {
+                personalRecord = milliseconds;  // Update personal record
+                document.getElementById("record").textContent = "Personal Record: " + formatTime(personalRecord);
+            }
+
+            milliseconds = 0;  // Reset the milliseconds counter
+            document.getElementById("counter").textContent = formatTime(milliseconds);
+            clearInterval(timer);  // Stop the existing timer
+            timer = setInterval(updateCounter, 10);  // Start a new timer (every 10ms)
+        }
+
+        // Event listeners for user activity (mouse movement, keypress, scrolling)
+        document.addEventListener("mousemove", resetCounter);
+        document.addEventListener("keydown", resetCounter);
+        document.addEventListener("scroll", resetCounter);
+
+        // Start the inactivity timer initially
+        timer = setInterval(updateCounter, 10);  // Update every 10 milliseconds for accuracy
         // Get audio elements
         var bgAudio = document.getElementById('bgAudio');
         var boomAudio = document.getElementById('boomAudio');
