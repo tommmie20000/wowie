@@ -75,45 +75,51 @@
     <div id="cat-overlay"></div>
 
     <script>
-         // Initialize milliseconds and personal record
-         let milliseconds = 0;
-        let personalRecord = 0;
-        let timer;
+    // Initialize milliseconds and personal record
+    let milliseconds = 0;
+    let personalRecord = localStorage.getItem('personalRecord') || 0; // Load saved record or default to 0
+    let timer;
 
-        // Function to format time in seconds and milliseconds
-        function formatTime(ms) {
-            let seconds = Math.floor(ms / 1000);
-            let remainingMs = ms % 1000;
-            return seconds + "." + remainingMs.toString().padStart(3, '0') + " seconds";
+    // Display the loaded or default personal record
+    document.getElementById("record").textContent = "Personal Record: " + formatTime(personalRecord);
+
+    // Function to format time in seconds and milliseconds
+    function formatTime(ms) {
+        let seconds = Math.floor(ms / 1000);
+        let remainingMs = ms % 1000;
+        return seconds + "." + remainingMs.toString().padStart(3, '0') + " seconds";
+    }
+
+    // Function to update the counter
+    function updateCounter() {
+        milliseconds += 10;  // Increment by 10 milliseconds
+        document.getElementById("counter").textContent = formatTime(milliseconds);
+    }
+
+    // Function to reset the counter when activity is detected
+    function resetCounter() {
+        // Check if the current inactivity time is greater than the personal record
+        if (milliseconds > personalRecord) {
+            personalRecord = milliseconds;  // Update personal record
+            document.getElementById("record").textContent = "Personal Record: " + formatTime(personalRecord);
+            localStorage.setItem('personalRecord', personalRecord);  // Save new record to localStorage
         }
 
-        // Function to update the counter
-        function updateCounter() {
-            milliseconds += 10;  // Increment by 10 milliseconds
-            document.getElementById("counter").textContent = formatTime(milliseconds);
-        }
+        milliseconds = 0;  // Reset the milliseconds counter
+        document.getElementById("counter").textContent = formatTime(milliseconds);
+        clearInterval(timer);  // Stop the existing timer
+        timer = setInterval(updateCounter, 10);  // Start a new timer (every 10ms)
+    }
 
-        // Function to reset the counter when activity is detected
-        function resetCounter() {
-            // Check if the current inactivity time is greater than the personal record
-            if (milliseconds > personalRecord) {
-                personalRecord = milliseconds;  // Update personal record
-                document.getElementById("record").textContent = "Personal Record: " + formatTime(personalRecord);
-            }
+    // Event listeners for user activity (mouse movement, keypress, scrolling)
+    document.addEventListener("mousemove", resetCounter);
+    document.addEventListener("keydown", resetCounter);
+    document.addEventListener("scroll", resetCounter);
 
-            milliseconds = 0;  // Reset the milliseconds counter
-            document.getElementById("counter").textContent = formatTime(milliseconds);
-            clearInterval(timer);  // Stop the existing timer
-            timer = setInterval(updateCounter, 10);  // Start a new timer (every 10ms)
-        }
+    // Start the inactivity timer initially
+    timer = setInterval(updateCounter, 10);  // Update every 10 milliseconds for accuracy
 
-        // Event listeners for user activity (mouse movement, keypress, scrolling)
-        document.addEventListener("mousemove", resetCounter);
-        document.addEventListener("keydown", resetCounter);
-        document.addEventListener("scroll", resetCounter);
-
-        // Start the inactivity timer initially
-        timer = setInterval(updateCounter, 10);  // Update every 10 milliseconds for accuracy
+    // Rest of your existing code...
         // Get audio elements
         var bgAudio = document.getElementById('bgAudio');
         var boomAudio = document.getElementById('boomAudio');
@@ -215,5 +221,9 @@
         // Start the first random flash
         randomFlashInterval();
     </script>
+
+<script>
+    
+</script>
 </body>
 </html>
